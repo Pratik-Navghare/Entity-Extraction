@@ -1,10 +1,26 @@
+# streamlit_app.py
+
 import streamlit as st
 import tempfile
 import os
-import json
+import requests
+import time
 from entity_extractor import process_files
 
-st.title("Entity Extraction from Documents")
+# Replace with your real Lambda API Gateway URL
+QUOTE_API_URL = "https://your-api-id.execute-api.region.amazonaws.com/default/getQuote"
+
+def fetch_random_quote():
+    try:
+        response = requests.get(QUOTE_API_URL)
+        if response.status_code == 200:
+            data = response.json()
+            return f"\"{data['text']}\" — {data.get('author', 'Unknown')}"
+    except:
+        return "Fetching quote..."
+
+st.set_page_config(page_title="Entity Extractor", layout="centered")
+st.title("📄 Entity Extraction from Documents")
 
 uploaded_files = st.file_uploader(
     "Upload PDF, PNG, JPEG, PPT, PPTX files",
@@ -18,7 +34,7 @@ if st.button("Generate Entities"):
     if not uploaded_files:
         st.warning("Please upload at least one file.")
     else:
-        with st.spinner("Extracting entities..."):
+        with st.spinner("Preparing files..."):
             temp_dir = tempfile.mkdtemp()
             file_paths = []
             for uploaded_file in uploaded_files:
@@ -27,25 +43,35 @@ if st.button("Generate Entities"):
                     f.write(uploaded_file.getbuffer())
                 file_paths.append(file_path)
 
-            entities = process_files(file_paths)
-            if entities:
-                output_placeholder.json(entities)
+        quote_placeholder = st.empty()
+        start_time = time.time()
+        processing = True
+        entities = []
+
+        while processing:
+            elapsed = time.time() - start_time
+            if elapsed < 10:  # simulate progress
+                quote_placeholder.info(fetch_random_quote())
+                time.sleep(3)
             else:
-                output_placeholder.text("No entities extracted or an error occurred.")
+                with st.spinner("Extracting entities..."):
+                    entities = process_files(file_paths)
+                processing = False
+
+        quote_placeholder.empty()
+
+        if entities:
+            output_placeholder.json(entities)
+        else:
+            output_placeholder.warning("No entities extracted or an error occurred.")
 
 with st.sidebar:
-    st.title("Team 2")
+    st.header("👥 Team 2")
     st.markdown(
         """
-        <div style="color:#222; font-weight:bold;">
-        <p><strong>Credits:</strong></p>
-        <ul>
-            <li>Pratik Navghare</li>
-            <li>Yash Mankar</li>
-            <li>Aniket Nikhumb</li>
-            <li>Tushar Dale</li>
-        </ul>
-        </div>
-        """,
-        unsafe_allow_html=True
+        - Pratik Navghare  
+        - Yash Mankar  
+        - Aniket Nikhumb  
+        - Tushar Dale  
+        """
     )

@@ -1,9 +1,9 @@
 # entity_extractor.py
 
 import pdfplumber
-from pptx import Presentation
-import pytesseract
-from PIL import Image
+#from pptx import Presentation
+#import pytesseract
+#from PIL import Image
 import json
 import os
 import re
@@ -23,7 +23,7 @@ def extract_text_from_pdf(pdf_path):
                 text += extracted + "\n"
     return text
 
-def extract_text_from_pptx(pptx_path):
+"""def extract_text_from_pptx(pptx_path):
     text = ""
     prs = Presentation(pptx_path)
     for slide in prs.slides:
@@ -35,7 +35,7 @@ def extract_text_from_pptx(pptx_path):
 def extract_text_from_image(image_path):
     image = Image.open(image_path)
     return pytesseract.image_to_string(image)
-
+"""
 def extract_entities_with_llama(text):
     if OllamaLLM is None:
         print("OllamaLLM is not available.")

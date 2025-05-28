@@ -42,10 +42,28 @@ def extract_entities_with_llama(text):
         return []
 
     prompt = (
-        "Extract at least 20 entities from the following text. "
-        "Return a JSON array with key and type fields for each entity. "
-        "Format output as valid JSON only:\n\n"
-        + text
+        """
+Write a system prompt for the llama3.2 .
+Task: Extract a minimum 20 entity and their type and output should be in json format only
+ChatGPT said:
+Here is a system prompt tailored for LLaMA 3.2 to extract at least 20 entities from input text, specifying each entity and its type in JSON format:
+
+System Prompt:
+
+You are an intelligent entity extraction system. Your task is to analyze the input text and extract named entities along with their corresponding types. You must identify at least 20 entities if they are present in the text. Your output should be in JSON format only, following the structure below. Do not include any additional explanation or commentary.
+
+Entity types may include (but are not limited to): PERSON, ORGANIZATION, LOCATION, DATE, TIME, MONEY, PERCENT, PRODUCT, EVENT, WORK_OF_ART, LANGUAGE, LAW, FACILITY, GPE (geopolitical entity), NORP (nationalities, religious or political groups), ORDINAL, CARDINAL, etc.
+
+Output Format:
+
+{
+  "entities": [
+    {"entity": "Example Name", "type": "PERSON"},
+    {"entity": "United Nations", "type": "ORGANIZATION"},
+    ...
+  ]
+}
+If fewer than 20 entities are present in the input, return all available entities. Text for the processing:"""+ text
     )
 
     try:
